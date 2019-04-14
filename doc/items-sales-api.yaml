@@ -1,0 +1,149 @@
+swagger: '2.0'
+info:
+  description: >-
+    This is the ItemSalesReport API. It provides basic functionalities to get
+    insight on sales across different time spans and geographic areas.
+  version: 0.1
+  title: Item Sales Report API
+host: items.salesreport.test
+basePath: /v1
+tags:
+  - name: sales
+    description: Data on sales
+schemes:
+  - https
+  - http
+paths:
+  /sales:
+    get:
+      tags:
+        - sales
+      summary: Get the total sum of sales
+      description: ''
+      operationId: getSalesSum
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: periodType
+          in: query
+          description: Type of period to be considerd
+          required: true
+          type: string
+          enum:
+            - Y
+            - S
+            - Q
+            - M
+            - D
+        - name: periodId
+          in: query
+          description: Period id to be considered
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/SalesSum'
+        '400':
+          description: Invalid timeframe
+  /sales/topByGeo:
+    get:
+      tags:
+        - sales
+      summary: Get the best geo performers in sales
+      description: ''
+      operationId: getSalesTopByGeo
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: geoType
+          in: query
+          description: Geographic granularity to get data
+          required: true
+          type: string
+          enum:
+            - region
+            - area
+            - market
+        - name: periodType
+          in: query
+          description: Type of period to be considerd
+          required: true
+          type: string
+          enum:
+            - 'Y'
+            - S
+            - Q
+            - M
+            - D
+        - name: periodId
+          in: query
+          description: Period id to be considered
+          required: true
+          type: string
+        - name: 'n'
+          in: query
+          description: How many results be retrieved
+          required: false
+          type: integer
+          format: int32
+          default: 6
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/SalesChart'
+        '400':
+          description: Invalid input on timeframe or geotype
+definitions:
+  SalesSum:
+    type: object
+    properties:
+      periodType:
+        type: string
+        enum:
+          - 'Y'
+          - S
+          - Q
+          - M
+          - D
+      periodId:
+        type: string
+      totalSales:
+        type: integer
+        format: int64
+  SalesChart:
+    type: object
+    properties:
+      periodType:
+        type: string
+        enum:
+          - Y
+          - S
+          - Q
+          - M
+          - D
+      periodId:
+        type: string
+      geoType:
+        type: string
+        description: Geographic granularity
+        enum:
+          - region
+          - area
+          - market
+      salesList:
+        type: array
+        items:
+          type: object
+          properties:
+            geoId:
+              type: string
+            totalSales:
+              type: integer
+              format: int64
